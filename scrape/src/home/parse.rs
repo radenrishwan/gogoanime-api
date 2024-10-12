@@ -29,12 +29,22 @@ pub fn parse_list(element: ElementRef) -> RecentRelease {
         .attr("href")
         .unwrap();
 
-    RecentRelease::new(title, img.to_string(), eps, url.to_string())
+    let episode_slug = url.split("/").collect::<Vec<&str>>()[2];
+
+    RecentRelease::new(
+        title,
+        img.to_string(),
+        eps,
+        url.to_string(),
+        episode_slug.to_string(),
+    )
 }
 
 pub fn parse_recently_added_series(element: ElementRef) -> RecentlyAddedSeries {
     let title = element.value().attr("title").unwrap();
     let url = element.value().attr("href").unwrap();
 
-    RecentlyAddedSeries::new(url.to_string(), title.to_string())
+    let detail_slug = url.split("/").collect::<Vec<&str>>()[2];
+
+    RecentlyAddedSeries::new(url.to_string(), title.to_string(), detail_slug.to_string())
 }

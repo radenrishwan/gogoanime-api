@@ -8,9 +8,10 @@ use crate::error_struct::ScrapeError;
 
 use self::model::Episode;
 
-pub async fn get() -> Result<Episode, Box<dyn Error>> {
-    let resp =
-        reqwest::get("https://ww8.gogoanimes.org/watch/kankin-kuiki-level-x-episode-5").await?;
+pub async fn get(episode_slug: String) -> Result<Episode, Box<dyn Error>> {
+    let url = format!("https://ww8.gogoanimes.org/watch/{}", episode_slug);
+
+    let resp = reqwest::get(url).await?;
     if resp.status().is_client_error() {
         return Err(Box::new(ScrapeError::new(
             "Failed to get response".to_string(),

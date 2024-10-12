@@ -8,10 +8,11 @@ use self::model::{Detail, Episode};
 
 pub mod model;
 
-pub async fn get() -> Result<Detail, Box<dyn Error>> {
-    let resp =
-        reqwest::get("https://ww8.gogoanimes.org/category/kimetsu-no-yaiba-katanakaji-no-sato-hen")
-            .await?;
+pub async fn get(detail_slug: String) -> Result<Detail, Box<dyn Error>> {
+    // https://ww8.gogoanimes.org/category/kimetsu-no-yaiba-katanakaji-no-sato-hen
+    let url = format!("https://ww8.gogoanimes.org/category/{}", detail_slug);
+
+    let resp = reqwest::get(url).await?;
 
     if resp.status().is_client_error() {
         return Err(Box::new(ScrapeError::new(

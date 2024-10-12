@@ -25,7 +25,13 @@ pub async fn get(page: u32) -> Result<Vec<AnimeList>, Box<dyn error::Error>> {
             let title = x.text().collect::<String>();
             let url = x.value().attr("href").unwrap();
 
-            anime_list.push(AnimeList::new(title.trim().to_string(), url.to_string()));
+            let detail_slug = url.split("/").collect::<Vec<&str>>()[2].to_string();
+
+            anime_list.push(AnimeList::new(
+                title.trim().to_string(),
+                url.to_string(),
+                detail_slug,
+            ));
         });
 
     Ok(anime_list)

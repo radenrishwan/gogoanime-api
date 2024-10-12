@@ -52,11 +52,14 @@ pub async fn get(page: u32) -> Result<Vec<Popular>, Box<dyn Error>> {
                 .parse::<u32>()
                 .unwrap();
 
+            let detail_slug = url.split("/").collect::<Vec<&str>>()[2].to_string();
+
             releases.push(Popular::new(
                 title.to_string(),
                 url.to_string(),
                 img.to_string(),
                 released,
+                detail_slug,
             ));
         });
 

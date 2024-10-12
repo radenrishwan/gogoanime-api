@@ -2,6 +2,7 @@ use serde::Serialize;
 
 #[derive(Debug, Serialize)]
 pub struct PopularOngoing {
+    detail_slug: String,
     title: String,
     img: String,
     episode: String,
@@ -16,6 +17,7 @@ impl PopularOngoing {
         episode: String,
         url: String,
         genre: Vec<String>,
+        detail_slug: String,
     ) -> Self {
         PopularOngoing {
             title,
@@ -23,6 +25,7 @@ impl PopularOngoing {
             episode,
             url,
             genre,
+            detail_slug,
         }
     }
 }

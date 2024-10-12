@@ -27,9 +27,11 @@ pub async fn get(page: u32) -> Result<Vec<RecentRelease>, Box<dyn Error>> {
     document
         .select(&Selector::parse("div.last_episodes.loaddub > ul > li > div > a").unwrap())
         .for_each(|x| {
+            let href = x.value().attr("href").unwrap();
+
             releases.push(RecentRelease::new(
                 x.value().attr("title").unwrap().to_string(),
-                x.value().attr("href").unwrap().to_string(),
+                href.to_string(),
                 x.select(&Selector::parse("img").unwrap())
                     .next()
                     .unwrap()
@@ -37,6 +39,7 @@ pub async fn get(page: u32) -> Result<Vec<RecentRelease>, Box<dyn Error>> {
                     .attr("src")
                     .unwrap()
                     .to_string(),
+                href.split("/").collect::<Vec<&str>>()[2].to_string(),
             ));
         });
 

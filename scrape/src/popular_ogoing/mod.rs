@@ -68,11 +68,14 @@ pub fn parse_popular_ongoing_update(element: ElementRef) -> PopularOngoing {
     // get the url from the style attribute
     let img = img.split("'").collect::<Vec<&str>>()[1];
 
+    let detail_slug = url.split("/").collect::<Vec<&str>>()[2];
+
     PopularOngoing::new(
         title.to_string(),
         img.to_string(),
         eps,
         url.to_string(),
         genres,
+        detail_slug.to_string(),
     )
 }

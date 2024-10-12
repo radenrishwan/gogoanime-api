@@ -37,9 +37,11 @@ pub async fn get() -> Result<Home, Box<dyn Error>> {
     for element in document
         .select(&Selector::parse("#scrollbar2 > div.viewport > div > nav > ul > li > a").unwrap())
     {
+        let href = element.value().attr("href").unwrap();
         ongoing_series_list.push(OngoingSeries::new(
-            element.value().attr("href").unwrap().to_string(),
+            href.to_string(),
             element.value().attr("title").unwrap().to_string(),
+            href.to_string().split("/").collect::<Vec<&str>>()[2].to_string(), // split from /catogory/example-slug
         ));
     }
 

@@ -1,5 +1,5 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-use serde::Serialize;
+use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
 struct DefaultResponse<T> {
@@ -16,6 +16,11 @@ impl<T> DefaultResponse<T> {
             data,
         }
     }
+}
+
+#[derive(Deserialize)]
+struct Page {
+    page: String,
 }
 
 #[get("/")]
@@ -37,9 +42,11 @@ async fn echo() -> impl Responder {
     }
 }
 
-#[get("/api/details")]
-async fn details() -> impl Responder {
-    match scrape::detail::get().await {
+#[get("/api/details/{slug}")]
+async fn details(req: HttpRequest) -> impl Responder {
+    let slug = req.match_info().get("slug").unwrap().to_string();
+
+    match scrape::detail::get(slug).await {
         Ok(detail) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", detail)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -49,9 +56,11 @@ async fn details() -> impl Responder {
     }
 }
 
-#[get("/api/episode")]
-async fn episode() -> impl Responder {
-    match scrape::episode::get().await {
+#[get("/api/episode/{slug}")]
+async fn episode(req: HttpRequest) -> impl Responder {
+    let slug = req.match_info().get("slug").unwrap().to_string();
+
+    match scrape::episode::get(slug).await {
         Ok(episode) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", episode)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -62,8 +71,8 @@ async fn episode() -> impl Responder {
 }
 
 #[get("/api/recent-release")]
-async fn recent_release() -> impl Responder {
-    match scrape::recent_release::get(1).await {
+async fn recent_release(page: web::Query<Page>) -> impl Responder {
+    match scrape::recent_release::get(page.page.parse::<u32>().unwrap_or(1)).await {
         Ok(releases) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", releases)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -74,8 +83,8 @@ async fn recent_release() -> impl Responder {
 }
 
 #[get("/api/popular-ongoing")]
-async fn popular_ongoing() -> impl Responder {
-    match scrape::popular_ogoing::get(1).await {
+async fn popular_ongoing(page: web::Query<Page>) -> impl Responder {
+    match scrape::popular_ogoing::get(page.page.parse::<u32>().unwrap_or(1)).await {
         Ok(popular) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", popular)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -98,8 +107,8 @@ async fn new_release() -> impl Responder {
 }
 
 #[get("/api/anime-list")]
-async fn anime_list() -> impl Responder {
-    match scrape::anime_list::get(1).await {
+async fn anime_list(page: web::Query<Page>) -> impl Responder {
+    match scrape::anime_list::get(page.page.parse::<u32>().unwrap_or(1)).await {
         Ok(anime_list) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", anime_list)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -110,8 +119,8 @@ async fn anime_list() -> impl Responder {
 }
 
 #[get("/api/popular")]
-async fn popular_list() -> impl Responder {
-    match scrape::popular::get(1).await {
+async fn popular_list(page: web::Query<Page>) -> impl Responder {
+    match scrape::popular::get(page.page.parse::<u32>().unwrap_or(1)).await {
         Ok(popular_list) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", popular_list)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,

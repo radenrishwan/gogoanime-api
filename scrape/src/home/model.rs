@@ -1,9 +1,9 @@
 use serde::Serialize;
 
 use crate::popular_ogoing::model::PopularOngoing;
-
 #[derive(Debug, Serialize)]
 pub struct RecentRelease {
+    episode_slug: String,
     title: String,
     img: String,
     eps: String,
@@ -11,8 +11,9 @@ pub struct RecentRelease {
 }
 
 impl RecentRelease {
-    pub fn new(title: String, img: String, eps: String, url: String) -> Self {
+    pub fn new(title: String, img: String, eps: String, url: String, episode_slug: String) -> Self {
         RecentRelease {
+            episode_slug,
             title,
             img,
             eps,
@@ -23,25 +24,35 @@ impl RecentRelease {
 
 #[derive(Debug, Serialize)]
 pub struct RecentlyAddedSeries {
+    detail_slug: String,
     url: String,
     title: String,
 }
 
 impl RecentlyAddedSeries {
-    pub fn new(url: String, title: String) -> Self {
-        RecentlyAddedSeries { url, title }
+    pub fn new(url: String, title: String, detail_slug: String) -> Self {
+        RecentlyAddedSeries {
+            url,
+            title,
+            detail_slug,
+        }
     }
 }
 
 #[derive(Debug, Serialize)]
 pub struct OngoingSeries {
+    detail_slug: String,
     url: String,
     title: String,
 }
 
 impl OngoingSeries {
-    pub fn new(url: String, title: String) -> Self {
-        OngoingSeries { url, title }
+    pub fn new(url: String, title: String, detail_slug: String) -> Self {
+        OngoingSeries {
+            url,
+            title,
+            detail_slug,
+        }
     }
 }
 
