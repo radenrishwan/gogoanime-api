@@ -60,6 +60,18 @@ async fn episode() -> impl Responder {
     }
 }
 
+#[get("/api/recent-release")]
+async fn recent_release() -> impl Responder {
+    match scrape::recent_release::get(1).await {
+        Ok(releases) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", releases)),
+        Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
+            500,
+            "Error while getting data",
+            e.to_string(),
+        )),
+    }
+}
+
 pub async fn run() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
@@ -67,6 +79,7 @@ pub async fn run() -> std::io::Result<()> {
             .service(echo)
             .service(details)
             .service(episode)
+            .service(recent_release)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
