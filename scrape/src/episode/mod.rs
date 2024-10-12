@@ -1,4 +1,4 @@
-mod model;
+pub mod model;
 
 use std::error::Error;
 

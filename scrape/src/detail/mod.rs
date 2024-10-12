@@ -6,7 +6,7 @@ use crate::error_struct::ScrapeError;
 
 use self::model::{Detail, Episode};
 
-mod model;
+pub mod model;
 
 pub async fn get() -> Result<Detail, Box<dyn Error>> {
     let resp =

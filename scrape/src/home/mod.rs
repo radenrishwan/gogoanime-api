@@ -6,7 +6,7 @@ use crate::{
     error_struct::ScrapeError,
     home::{
         model::{Home, OngoingSeries},
-        parse::{parse_list, parse_popular_ongoing_update, parse_recently_added_series},
+        parse::{parse_list, parse_recently_added_series},
     },
 };
 
@@ -52,11 +52,7 @@ pub async fn get() -> Result<Home, Box<dyn Error>> {
         )));
     }
 
-    let document = Html::parse_document(resp.text().await.unwrap().as_str());
-    let mut popular_list = vec![];
-    for element in document.select(&Selector::parse(".added_series_body > ul > li").unwrap()) {
-        popular_list.push(parse_popular_ongoing_update(element));
-    }
+    let popular_list = crate::popular_ogoing::get(1).await.unwrap();
 
     Ok(Home::new(
         recent_release,

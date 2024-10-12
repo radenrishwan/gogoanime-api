@@ -1,5 +1,7 @@
 use serde::Serialize;
 
+use crate::popular_ogoing::model::PopularOngoing;
+
 #[derive(Debug, Serialize)]
 pub struct RecentRelease {
     title: String,
@@ -32,33 +34,6 @@ impl RecentlyAddedSeries {
 }
 
 #[derive(Debug, Serialize)]
-pub struct PopularOngoingUpdate {
-    title: String,
-    img: String,
-    episode: String,
-    url: String,
-    genre: Vec<String>,
-}
-
-impl PopularOngoingUpdate {
-    pub fn new(
-        title: String,
-        img: String,
-        episode: String,
-        url: String,
-        genre: Vec<String>,
-    ) -> Self {
-        PopularOngoingUpdate {
-            title,
-            img,
-            episode,
-            url,
-            genre,
-        }
-    }
-}
-
-#[derive(Debug, Serialize)]
 pub struct OngoingSeries {
     url: String,
     title: String,
@@ -75,7 +50,7 @@ pub struct Home {
     recent_release: Vec<RecentRelease>,
     recently_added_series: Vec<RecentlyAddedSeries>,
     ongoing_series: Vec<OngoingSeries>,
-    popular_ongoing_update: Vec<PopularOngoingUpdate>,
+    popular_ongoing_update: Vec<PopularOngoing>,
 }
 
 impl Home {
@@ -83,7 +58,7 @@ impl Home {
         recent_release: Vec<RecentRelease>,
         recently_added_series: Vec<RecentlyAddedSeries>,
         ongoing_series: Vec<OngoingSeries>,
-        popular_ongoing_update: Vec<PopularOngoingUpdate>,
+        popular_ongoing_update: Vec<PopularOngoing>,
     ) -> Self {
         Home {
             recent_release,
