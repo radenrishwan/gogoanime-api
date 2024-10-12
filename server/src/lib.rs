@@ -96,6 +96,18 @@ async fn new_release() -> impl Responder {
     }
 }
 
+#[get("/api/anime-list")]
+async fn anime_list() -> impl Responder {
+    match scrape::anime_list::get(1).await {
+        Ok(anime_list) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", anime_list)),
+        Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
+            500,
+            "Error while getting data",
+            e.to_string(),
+        )),
+    }
+}
+
 pub async fn run() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
@@ -106,6 +118,7 @@ pub async fn run() -> std::io::Result<()> {
             .service(recent_release)
             .service(popular_ongoing)
             .service(new_release)
+            .service(anime_list)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

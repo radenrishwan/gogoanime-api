@@ -1,5 +1,6 @@
 pub mod error_struct;
 
+pub mod anime_list;
 pub mod detail;
 pub mod episode;
 pub mod home;
