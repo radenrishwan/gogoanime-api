@@ -130,9 +130,14 @@ async fn popular_list(page: web::Query<Page>) -> impl Responder {
     }
 }
 
+#[derive(Deserialize)]
+struct Search {
+    query: String,
+}
+
 #[get("/api/search")]
-async fn search() -> impl Responder {
-    match scrape::search::get("naruto").await {
+async fn search(search: web::Query<Search>) -> impl Responder {
+    match scrape::search::get(search.query.to_string()).await {
         Ok(search) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", search)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
