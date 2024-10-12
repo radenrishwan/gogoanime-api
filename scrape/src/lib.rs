@@ -8,3 +8,4 @@ pub mod new_season;
 pub mod popular;
 pub mod popular_ogoing;
 pub mod recent_release;
+pub mod search;
