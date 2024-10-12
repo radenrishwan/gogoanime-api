@@ -2,13 +2,13 @@ use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 
 #[derive(Debug, serde::Serialize)]
 struct DefaultResponse<T> {
-    status: u8,
+    status: u16,
     message: &'static str,
     data: T,
 }
 
 impl<T> DefaultResponse<T> {
-    fn new(status: u8, message: &'static str, data: T) -> Self {
+    fn new(status: u16, message: &'static str, data: T) -> Self {
         DefaultResponse {
             status,
             message,
@@ -24,17 +24,33 @@ async fn hello() -> impl Responder {
 
 #[get("/api/home")]
 async fn echo() -> impl Responder {
-    match scrape::home::scrape().await {
+    match scrape::home::get().await {
         Ok(data) => {
             HttpResponse::Ok().json(DefaultResponse::new(200, "Success getting data", data))
         }
-        Err(e) => HttpResponse::InternalServerError().body(format!("Error: {}", e)),
+        Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
+            500,
+            "Error while getting data",
+            e.to_string(),
+        )),
+    }
+}
+
+#[get("/api/details")]
+async fn details() -> impl Responder {
+    match scrape::detail::get().await {
+        Ok(detail) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", detail)),
+        Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
+            500,
+            "Error while getting data",
+            e.to_string(),
+        )),
     }
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(hello).service(echo))
+    HttpServer::new(|| App::new().service(hello).service(echo).service(details))
         .bind(("127.0.0.1", 8080))?
         .run()
         .await

@@ -13,7 +13,7 @@ use crate::{
 pub mod model;
 pub mod parse;
 
-pub async fn scrape() -> Result<Home, Box<dyn Error>> {
+pub async fn get() -> Result<Home, Box<dyn Error>> {
     let resp = reqwest::get("https://ww8.gogoanimes.org/").await?;
 
     if resp.status().is_client_error() {
