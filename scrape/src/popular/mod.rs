@@ -6,10 +6,10 @@ use scraper::{Html, Selector};
 
 use crate::error_struct::ScrapeError;
 
-use self::model::NewRelease;
+use self::model::Popular;
 
-pub async fn get(page: u32) -> Result<Vec<NewRelease>, Box<dyn Error>> {
-    let url = format!("https://ww8.gogoanimes.org/new-season?page={}", page);
+pub async fn get(page: u32) -> Result<Vec<Popular>, Box<dyn Error>> {
+    let url = format!("https://ww8.gogoanimes.org/popular?page={}", page);
 
     let resp = reqwest::get(url).await?;
     if resp.status().is_client_error() {
@@ -52,7 +52,7 @@ pub async fn get(page: u32) -> Result<Vec<NewRelease>, Box<dyn Error>> {
                 .parse::<u32>()
                 .unwrap();
 
-            releases.push(NewRelease::new(
+            releases.push(Popular::new(
                 title.to_string(),
                 url.to_string(),
                 img.to_string(),

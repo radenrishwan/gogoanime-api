@@ -1,14 +1,14 @@
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
-pub struct NewRelease {
+pub struct NewSeason {
     title: String,
     img: String,
     url: String,
     release_date: u32,
 }
 
-impl NewRelease {
+impl NewSeason {
     pub fn new(title: String, img: String, url: String, release_date: u32) -> Self {
         Self {
             title,

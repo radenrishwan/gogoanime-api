@@ -1,6 +1,7 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use serde::Serialize;
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, Serialize)]
 struct DefaultResponse<T> {
     status: u16,
     message: &'static str,
@@ -86,7 +87,7 @@ async fn popular_ongoing() -> impl Responder {
 
 #[get("/api/new-release")]
 async fn new_release() -> impl Responder {
-    match scrape::new_release::get(1).await {
+    match scrape::new_season::get(1).await {
         Ok(new_release) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", new_release)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -108,6 +109,18 @@ async fn anime_list() -> impl Responder {
     }
 }
 
+#[get("/api/popular")]
+async fn popular_list() -> impl Responder {
+    match scrape::popular::get(1).await {
+        Ok(popular_list) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", popular_list)),
+        Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
+            500,
+            "Error while getting data",
+            e.to_string(),
+        )),
+    }
+}
+
 pub async fn run() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
@@ -119,6 +132,7 @@ pub async fn run() -> std::io::Result<()> {
             .service(popular_ongoing)
             .service(new_release)
             .service(anime_list)
+            .service(popular_list)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
