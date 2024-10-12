@@ -50,14 +50,10 @@ pub async fn get() -> Result<Detail, Box<dyn Error>> {
                 .for_each(|f| {
                     genres.push(f.text().collect::<String>());
                 });
-
-            println!("{:?}", genres);
         } else if values.0 == "other_name" {
             values.1.split(";").for_each(|f| {
                 other_names.push(f.trim().to_string());
             });
-
-            println!("{:?}", other_names);
         } else {
             details_list.insert(values.0, values.1);
         }

@@ -658,8 +658,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "scrape",
- "serde",
- "serde_json",
+ "server",
 ]
 
 [[package]]
@@ -1620,6 +1619,15 @@ dependencies = [
  "form_urlencoded",
  "itoa",
  "ryu",
+ "serde",
+]
+
+[[package]]
+name = "server"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "scrape",
  "serde",
 ]
 
