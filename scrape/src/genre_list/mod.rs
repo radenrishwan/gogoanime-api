@@ -6,10 +6,10 @@ use scraper::{Html, Selector};
 
 use crate::error_struct::ScrapeError;
 
-use self::model::NewSeason;
+use self::model::GenreList;
 
-pub async fn get(page: u32) -> Result<Vec<NewSeason>, Box<dyn Error>> {
-    let url = format!("https://ww8.gogoanimes.org/new-season?page={}", page);
+pub async fn get(genre: String, page: u32) -> Result<Vec<GenreList>, Box<dyn Error>> {
+    let url = format!("https://ww8.gogoanimes.org/genre/{}?page={}", genre, page);
 
     let resp = reqwest::get(url).await?;
     if resp.status().is_client_error() {
@@ -54,7 +54,7 @@ pub async fn get(page: u32) -> Result<Vec<NewSeason>, Box<dyn Error>> {
 
             let detail_slug = url.split("/").collect::<Vec<&str>>()[2].to_string();
 
-            releases.push(NewSeason::new(
+            releases.push(GenreList::new(
                 title.to_string(),
                 url.to_string(),
                 img.to_string(),

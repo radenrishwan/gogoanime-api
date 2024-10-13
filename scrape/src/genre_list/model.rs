@@ -1,7 +1,7 @@
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
-pub struct NewSeason {
+pub struct GenreList {
     detail_slug: String,
     title: String,
     img: String,
@@ -9,7 +9,7 @@ pub struct NewSeason {
     release_date: u32,
 }
 
-impl NewSeason {
+impl GenreList {
     pub fn new(
         title: String,
         img: String,

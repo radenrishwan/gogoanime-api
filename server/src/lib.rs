@@ -147,6 +147,32 @@ async fn search(search: web::Query<Search>) -> impl Responder {
     }
 }
 
+#[get("/api/genres")]
+async fn genres() -> impl Responder {
+    match scrape::genre::get().await {
+        Ok(genres) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", genres)),
+        Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
+            500,
+            "Error while getting data",
+            e.to_string(),
+        )),
+    }
+}
+
+#[get("/api/genre/{genre}")]
+async fn genre(query: web::Query<Page>, req: HttpRequest) -> impl Responder {
+    let genre = req.match_info().get("genre").unwrap().to_string();
+
+    match scrape::genre_list::get(genre, query.page.parse::<u32>().unwrap_or(1)).await {
+        Ok(genre_list) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", genre_list)),
+        Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
+            500,
+            "Error while getting data",
+            e.to_string(),
+        )),
+    }
+}
+
 pub async fn run() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
@@ -160,6 +186,8 @@ pub async fn run() -> std::io::Result<()> {
             .service(anime_list)
             .service(popular_list)
             .service(search)
+            .service(genres)
+            .service(genre)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
