@@ -6,7 +6,7 @@ use crate::error_struct::ScrapeError;
 
 use self::model::RecentRelease;
 
-mod model;
+pub mod model;
 
 pub async fn get(page: u32) -> Result<Vec<RecentRelease>, Box<dyn Error>> {
     let url = format!(
