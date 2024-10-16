@@ -5,12 +5,17 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 pub struct Episode {
     title: i32,
+    episode_slug: String,
     url: String,
 }
 
 impl Episode {
-    pub fn new(title: i32, url: String) -> Self {
-        Self { title, url }
+    pub fn new(title: i32, url: String, episode_slug: String) -> Self {
+        Self {
+            title,
+            url,
+            episode_slug,
+        }
     }
 }
 

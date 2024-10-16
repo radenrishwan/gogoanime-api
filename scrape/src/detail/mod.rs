@@ -89,7 +89,14 @@ pub async fn get(detail_slug: String) -> Result<Detail, Box<dyn Error>> {
                 Err(_) => -1,
             };
 
-            episodes.push(Episode::new(episode, url));
+            let episode_slug = url
+                .split("/")
+                .collect::<Vec<&str>>()
+                .last()
+                .unwrap()
+                .to_string();
+
+            episodes.push(Episode::new(episode, url, episode_slug));
         });
 
     Ok(Detail::new(
