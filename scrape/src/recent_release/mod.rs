@@ -22,24 +22,52 @@ pub async fn get(page: u32) -> Result<Vec<RecentRelease>, Box<dyn Error>> {
         )));
     }
 
+    // body > div.last_episodes.loaddub > ul > li:nth-child(4) > p.episode
     let document = Html::parse_document(resp.text().await?.as_str());
     let mut releases = vec![];
     document
-        .select(&Selector::parse("div.last_episodes.loaddub > ul > li > div > a").unwrap())
+        .select(&Selector::parse("div.last_episodes.loaddub > ul > li").unwrap())
         .for_each(|x| {
-            let href = x.value().attr("href").unwrap();
+            // div.last_episodes.loaddub > ul > li > div > a
+            let title = x
+                .select(&Selector::parse("div > a").unwrap())
+                .next()
+                .unwrap()
+                .value()
+                .attr("title")
+                .unwrap();
+
+            let href = x
+                .select(&Selector::parse("div > a").unwrap())
+                .next()
+                .unwrap()
+                .value()
+                .attr("href")
+                .unwrap();
+
+            let img = x
+                .select(&Selector::parse("div > a > img").unwrap())
+                .next()
+                .unwrap()
+                .value()
+                .attr("src")
+                .unwrap();
+
+            let eps = x
+                .select(&Selector::parse("p.episode").unwrap())
+                .next()
+                .unwrap()
+                .text()
+                .collect::<String>();
 
             releases.push(RecentRelease::new(
-                x.value().attr("title").unwrap().to_string(),
+                title.to_string(),
                 href.to_string(),
-                x.select(&Selector::parse("img").unwrap())
-                    .next()
-                    .unwrap()
-                    .value()
-                    .attr("src")
-                    .unwrap()
-                    .to_string(),
+                img.to_string(),
                 href.split("/").collect::<Vec<&str>>()[2].to_string(),
+                eps.split(" ").collect::<Vec<&str>>()[1]
+                    .parse::<u32>()
+                    .unwrap(),
             ));
         });
 

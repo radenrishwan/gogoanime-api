@@ -1,5 +1,9 @@
 use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use scrape::gogoanime::{Gogoanime, GogoanimeOption};
 use serde::{Deserialize, Serialize};
+
+const BASE_URL: &str = "https://ww8.gogoanimes.org";
+const PORT: u16 = 8080;
 
 #[derive(Debug, Serialize)]
 struct DefaultResponse<T> {
@@ -30,9 +34,10 @@ async fn hello() -> impl Responder {
 }
 
 #[get("/api/home")]
-async fn echo() -> impl Responder {
+async fn home(gogoanime: web::Data<Gogoanime>) -> impl Responder {
     println!("Route: /api/home");
-    match scrape::home::get().await {
+
+    match gogoanime.home().await {
         Ok(data) => {
             HttpResponse::Ok().json(DefaultResponse::new(200, "Success getting data", data))
         }
@@ -45,11 +50,11 @@ async fn echo() -> impl Responder {
 }
 
 #[get("/api/details/{slug}")]
-async fn details(req: HttpRequest) -> impl Responder {
+async fn details(gogoanime: web::Data<Gogoanime>, req: HttpRequest) -> impl Responder {
     println!("Route: /api/details/{{slug}}");
     let slug = req.match_info().get("slug").unwrap().to_string();
 
-    match scrape::detail::get(slug).await {
+    match gogoanime.detail(slug).await {
         Ok(detail) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", detail)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -60,11 +65,11 @@ async fn details(req: HttpRequest) -> impl Responder {
 }
 
 #[get("/api/episode/{slug}")]
-async fn episode(req: HttpRequest) -> impl Responder {
+async fn episode(gogoanime: web::Data<Gogoanime>, req: HttpRequest) -> impl Responder {
     println!("Route: /api/episode/{{slug}}");
     let slug = req.match_info().get("slug").unwrap().to_string();
 
-    match scrape::episode::get(slug).await {
+    match gogoanime.episode(slug).await {
         Ok(episode) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", episode)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -75,9 +80,12 @@ async fn episode(req: HttpRequest) -> impl Responder {
 }
 
 #[get("/api/recent-release")]
-async fn recent_release(page: web::Query<Page>) -> impl Responder {
+async fn recent_release(gogoanime: web::Data<Gogoanime>, page: web::Query<Page>) -> impl Responder {
     println!("Route: /api/recent-release");
-    match scrape::recent_release::get(page.page.parse::<u32>().unwrap_or(1)).await {
+    match gogoanime
+        .recent_release(page.page.parse::<u32>().unwrap_or(1))
+        .await
+    {
         Ok(releases) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", releases)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -88,9 +96,15 @@ async fn recent_release(page: web::Query<Page>) -> impl Responder {
 }
 
 #[get("/api/popular-ongoing")]
-async fn popular_ongoing(page: web::Query<Page>) -> impl Responder {
+async fn popular_ongoing(
+    gogoanime: web::Data<Gogoanime>,
+    page: web::Query<Page>,
+) -> impl Responder {
     println!("Route: /api/popular-ongoing");
-    match scrape::popular_ogoing::get(page.page.parse::<u32>().unwrap_or(1)).await {
+    match gogoanime
+        .popular_ongoing(page.page.parse::<u32>().unwrap_or(1))
+        .await
+    {
         Ok(popular) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", popular)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -101,9 +115,9 @@ async fn popular_ongoing(page: web::Query<Page>) -> impl Responder {
 }
 
 #[get("/api/new-release")]
-async fn new_release() -> impl Responder {
+async fn new_release(gogoanime: web::Data<Gogoanime>) -> impl Responder {
     println!("Route: /api/new-release");
-    match scrape::new_season::get(1).await {
+    match gogoanime.new_season(1).await {
         Ok(new_release) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", new_release)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -114,9 +128,13 @@ async fn new_release() -> impl Responder {
 }
 
 #[get("/api/anime-list")]
-async fn anime_list(page: web::Query<Page>) -> impl Responder {
+async fn anime_list(gogoanime: web::Data<Gogoanime>, page: web::Query<Page>) -> impl Responder {
     println!("Route: /api/anime-list");
-    match scrape::anime_list::get(page.page.parse::<u32>().unwrap_or(1)).await {
+
+    match gogoanime
+        .anime_list(page.page.parse::<u32>().unwrap_or(1))
+        .await
+    {
         Ok(anime_list) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", anime_list)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -127,9 +145,12 @@ async fn anime_list(page: web::Query<Page>) -> impl Responder {
 }
 
 #[get("/api/popular")]
-async fn popular_list(page: web::Query<Page>) -> impl Responder {
+async fn popular_list(gogoanime: web::Data<Gogoanime>, page: web::Query<Page>) -> impl Responder {
     println!("Route: /api/popular");
-    match scrape::popular::get(page.page.parse::<u32>().unwrap_or(1)).await {
+    match gogoanime
+        .popular(page.page.parse::<u32>().unwrap_or(1))
+        .await
+    {
         Ok(popular_list) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", popular_list)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -145,9 +166,9 @@ struct Search {
 }
 
 #[get("/api/search")]
-async fn search(search: web::Query<Search>) -> impl Responder {
+async fn search(gogoanime: web::Data<Gogoanime>, search: web::Query<Search>) -> impl Responder {
     println!("Route: /api/search");
-    match scrape::search::get(search.query.to_string()).await {
+    match gogoanime.search(search.query.to_string()).await {
         Ok(search) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", search)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -158,9 +179,9 @@ async fn search(search: web::Query<Search>) -> impl Responder {
 }
 
 #[get("/api/genres")]
-async fn genres() -> impl Responder {
+async fn genres(gogoanime: web::Data<Gogoanime>) -> impl Responder {
     println!("Route: /api/genres");
-    match scrape::genre::get().await {
+    match gogoanime.genre().await {
         Ok(genres) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", genres)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -171,11 +192,18 @@ async fn genres() -> impl Responder {
 }
 
 #[get("/api/genre/{genre}")]
-async fn genre(query: web::Query<Page>, req: HttpRequest) -> impl Responder {
+async fn genre(
+    gogoanime: web::Data<Gogoanime>,
+    query: web::Query<Page>,
+    req: HttpRequest,
+) -> impl Responder {
     println!("Route: /api/genre/{{genre}}");
     let genre = req.match_info().get("genre").unwrap().to_string();
 
-    match scrape::genre_list::get(genre, query.page.parse::<u32>().unwrap_or(1)).await {
+    match gogoanime
+        .genre_list(genre, query.page.parse::<u32>().unwrap_or(1))
+        .await
+    {
         Ok(genre_list) => HttpResponse::Ok().json(DefaultResponse::new(200, "OK", genre_list)),
         Err(e) => HttpResponse::InternalServerError().json(DefaultResponse::new(
             500,
@@ -186,10 +214,18 @@ async fn genre(query: web::Query<Page>, req: HttpRequest) -> impl Responder {
 }
 
 pub async fn run() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let client =
+        redis::Client::open("rediss://default:AZPlAAIjcDFlOTAyZGRlN2VmZDc0ZjUzOWI0ZDE1NGQwY2QxZGVmNHAxMA@sweet-seagull-37861.upstash.io:6379").unwrap();
+
+    let option = GogoanimeOption::new(BASE_URL.to_string(), true, 3600 * 12, Some(client));
+
+    let gogoanime = web::Data::new(Gogoanime::new_with_option(option));
+
+    HttpServer::new(move || {
         App::new()
+            .app_data(gogoanime.clone())
             .service(hello)
-            .service(echo)
+            .service(home)
             .service(details)
             .service(episode)
             .service(recent_release)
@@ -202,7 +238,7 @@ pub async fn run() -> std::io::Result<()> {
             .service(genre)
     })
     // when you running the project on local, you need to change the ip to 127.0.0.1
-    .bind(("0.0.0.0", 8080))?
+    .bind(("127.0.0.1", PORT))?
     .run()
     .await
 }
