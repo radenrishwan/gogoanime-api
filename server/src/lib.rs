@@ -238,7 +238,7 @@ pub async fn run() -> std::io::Result<()> {
             .service(genre)
     })
     // when you running the project on local, you need to change the ip to 127.0.0.1
-    .bind(("127.0.0.1", PORT))?
+    .bind(("0.0.0.0", PORT))?
     .run()
     .await
 }
