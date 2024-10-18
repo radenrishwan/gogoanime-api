@@ -8,7 +8,7 @@ use crate::error_struct::ScrapeError;
 
 use self::model::Search;
 
-pub async fn get(keyword: &str, base_url: String) -> Result<Vec<Search>, Box<dyn Error>> {
+pub async fn get(base_url: &str, keyword: String) -> Result<Vec<Search>, Box<dyn Error>> {
     let url = format!("{}/search?keyword={}", base_url, keyword);
 
     let resp = reqwest::get(url).await?;
@@ -52,11 +52,14 @@ pub async fn get(keyword: &str, base_url: String) -> Result<Vec<Search>, Box<dyn
                 .parse::<u32>()
                 .unwrap();
 
+            let detail_slug = url.split("/").collect::<Vec<&str>>()[2].to_string();
+
             result.push(Search::new(
                 title.to_string(),
-                url.to_string(),
                 img.to_string(),
+                url.to_string(),
                 search,
+                detail_slug,
             ));
         });
 
