@@ -214,10 +214,7 @@ async fn genre(
 }
 
 pub async fn run() -> std::io::Result<()> {
-    let client =
-        redis::Client::open("rediss://default:AZPlAAIjcDFlOTAyZGRlN2VmZDc0ZjUzOWI0ZDE1NGQwY2QxZGVmNHAxMA@sweet-seagull-37861.upstash.io:6379").unwrap();
-
-    let option = GogoanimeOption::new(BASE_URL.to_string(), true, 3600 * 12, Some(client));
+    let option = GogoanimeOption::new(BASE_URL.to_string());
 
     let gogoanime = web::Data::new(Gogoanime::new_with_option(option));
 
@@ -238,7 +235,7 @@ pub async fn run() -> std::io::Result<()> {
             .service(genre)
     })
     // when you running the project on local, you need to change the ip to 127.0.0.1
-    .bind(("127.0.0.1", PORT))?
+    .bind(("0.0.0.0", PORT))?
     .run()
     .await
 }

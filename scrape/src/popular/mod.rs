@@ -8,8 +8,8 @@ use crate::error_struct::ScrapeError;
 
 use self::model::Popular;
 
-pub async fn get(page: u32) -> Result<Vec<Popular>, Box<dyn Error>> {
-    let url = format!("https://ww8.gogoanimes.org/popular?page={}", page);
+pub async fn get(base_url: &str, page: u32) -> Result<Vec<Popular>, Box<dyn Error>> {
+    let url = format!("{}/popular?page={}", base_url, page);
 
     let resp = reqwest::get(url).await?;
     if resp.status().is_client_error() {
