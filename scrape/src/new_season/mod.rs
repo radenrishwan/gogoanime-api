@@ -8,8 +8,8 @@ use crate::error_struct::ScrapeError;
 
 use self::model::NewSeason;
 
-pub async fn get(page: u32) -> Result<Vec<NewSeason>, Box<dyn Error>> {
-    let url = format!("https://ww8.gogoanimes.org/new-season?page={}", page);
+pub async fn get(base_url: &str, page: u32) -> Result<Vec<NewSeason>, Box<dyn Error>> {
+    let url = format!("{}/new-season?page={}", base_url, page);
 
     let resp = reqwest::get(url).await?;
     if resp.status().is_client_error() {

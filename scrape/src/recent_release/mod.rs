@@ -8,11 +8,8 @@ use self::model::RecentRelease;
 
 pub mod model;
 
-pub async fn get(page: u32) -> Result<Vec<RecentRelease>, Box<dyn Error>> {
-    let url = format!(
-        "https://ww8.gogoanimes.org/ajax/page-recent-release?page={}",
-        page
-    );
+pub async fn get(base_url: &str, page: u32) -> Result<Vec<RecentRelease>, Box<dyn Error>> {
+    let url = format!("{}/ajax/page-recent-release?page={}", base_url, page);
 
     let resp = reqwest::get(&url).await?;
 

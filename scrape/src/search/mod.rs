@@ -8,8 +8,8 @@ use crate::error_struct::ScrapeError;
 
 use self::model::Search;
 
-pub async fn get(keyword: String) -> Result<Vec<Search>, Box<dyn Error>> {
-    let url = format!("https://ww8.gogoanimes.org/search?keyword={}", keyword);
+pub async fn get(keyword: &str, base_url: String) -> Result<Vec<Search>, Box<dyn Error>> {
+    let url = format!("{}/search?keyword={}", base_url, keyword);
 
     let resp = reqwest::get(url).await?;
     if resp.status().is_client_error() {

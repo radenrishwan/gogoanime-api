@@ -8,8 +8,8 @@ use crate::error_struct::ScrapeError;
 
 use self::model::Episode;
 
-pub async fn get(episode_slug: String) -> Result<Episode, Box<dyn Error>> {
-    let url = format!("https://ww8.gogoanimes.org/watch/{}", episode_slug);
+pub async fn get(base_url: &str, episode_slug: String) -> Result<Episode, Box<dyn Error>> {
+    let url = format!("{}/watch/{}", base_url, episode_slug);
 
     let resp = reqwest::get(url).await?;
     if resp.status().is_client_error() {

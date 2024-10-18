@@ -7,9 +7,12 @@ use scraper::{Html, Selector};
 use crate::error_struct::ScrapeError;
 
 use self::model::GenreList;
-
-pub async fn get(genre: String, page: u32) -> Result<Vec<GenreList>, Box<dyn Error>> {
-    let url = format!("https://ww8.gogoanimes.org/genre/{}?page={}", genre, page);
+pub async fn get(
+    base_url: &str,
+    genre: String,
+    page: u32,
+) -> Result<Vec<GenreList>, Box<dyn Error>> {
+    let url = format!("{}/genre/{}?page={}", base_url, genre, page);
 
     let resp = reqwest::get(url).await?;
     if resp.status().is_client_error() {

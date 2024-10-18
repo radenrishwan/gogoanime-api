@@ -8,8 +8,8 @@ use self::model::AnimeList;
 
 pub mod model;
 
-pub async fn get(page: u32) -> Result<Vec<AnimeList>, Box<dyn error::Error>> {
-    let url = format!("https://ww8.gogoanimes.org/anime-list?page={}", page);
+pub async fn get(base_url: &str, page: u32) -> Result<Vec<AnimeList>, Box<dyn error::Error>> {
+    let url = format!("{}/anime-list?page={}", base_url, page);
     let resp = reqwest::get(&url).await?;
     if resp.status().is_client_error() {
         return Err(Box::new(ScrapeError::new(

@@ -8,8 +8,8 @@ use self::model::Genre;
 
 pub mod model;
 
-pub async fn get() -> Result<Vec<Genre>, Box<dyn Error>> {
-    let resp = reqwest::get("https://ww8.gogoanimes.org/").await?;
+pub async fn get(base_url: &str) -> Result<Vec<Genre>, Box<dyn Error>> {
+    let resp = reqwest::get(base_url).await?;
 
     if resp.status().is_client_error() {
         return Err(Box::new(ScrapeError::new(

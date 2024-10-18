@@ -13,8 +13,8 @@ use crate::{
 pub mod model;
 pub mod parse;
 
-pub async fn get() -> Result<Home, Box<dyn Error>> {
-    let resp = reqwest::get("https://ww8.gogoanimes.org/").await?;
+pub async fn get(base_url: &str) -> Result<Home, Box<dyn Error>> {
+    let resp = reqwest::get(base_url).await?;
 
     if resp.status().is_client_error() {
         return Err(Box::new(ScrapeError::new(
@@ -54,7 +54,7 @@ pub async fn get() -> Result<Home, Box<dyn Error>> {
         )));
     }
 
-    let popular_list = crate::popular_ogoing::get(1).await.unwrap();
+    let popular_list = crate::popular_ogoing::get(base_url, 1).await.unwrap();
 
     Ok(Home::new(
         recent_release,
